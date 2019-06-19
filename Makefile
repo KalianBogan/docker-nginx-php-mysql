@@ -23,8 +23,13 @@ help:
 	@echo "  phpmd               Analyse the API with PHP Mess Detector"
 	@echo "  test                Test application"
 
-init:
-	@$(shell cp -n $(shell pwd)/web/app/composer.json.dist $(shell pwd)/web/app/composer.json 2> /dev/null)
+init: expand-default composer-up
+
+expand-default:
+	@$(shell mkdir -p $(shell pwd)/web/www)
+	@$(shell cp -R $(shell pwd)/web/default/. $(shell pwd)/web/www)
+	@$(shell mv $(shell pwd)/web/www/.gitignore.example $(shell pwd)/web/www/.gitignore)
+	@$(shell mv $(shell pwd)/web/www/app/composer.json.dist $(shell pwd)/web/www/app/composer.json 2> /dev/null)
 
 apidoc:
 	@docker-compose exec -T php php -d memory_limit=256M -d xdebug.profiler_enable=0 ./app/vendor/bin/apigen generate app/src --destination app/doc
@@ -44,7 +49,7 @@ code-sniff:
 	@docker-compose exec -T php ./app/vendor/bin/phpcs -v --standard=PSR2 app/src
 
 composer-up:
-	@docker run --rm -v $(shell pwd)/web/app:/app composer update
+	@docker run --rm -v $(shell pwd)/web/www/app:/app composer update
 
 docker-start: init
 	docker-compose up -d

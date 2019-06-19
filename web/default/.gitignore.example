@@ -1,0 +1,6 @@
+# Application
+app/composer.json
+app/composer.lock
+app/vendor/
+app/doc/
+app/report/
